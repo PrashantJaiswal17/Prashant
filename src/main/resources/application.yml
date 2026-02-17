@@ -1,0 +1,52 @@
+server:
+  port: 8080
+  tomcat:
+    threads:
+      max: 400
+      min-spare: 50
+    accept-count: 1000
+
+spring:
+  application:
+    name: order-management
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orders
+    username: orders
+    password: orders
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+        order_updates: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: order-management-group
+      auto-offset-reset: earliest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+app:
+  kafka:
+    topics:
+      order-created: order-created.v1
+      order-processed: order-processed.v1
+    producer:
+      acks: 1
+      linger-ms: 5
+      batch-size: 65536
+      compression-type: lz4
+    consumer:
+      concurrency: 24
